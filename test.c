@@ -64,7 +64,11 @@ static void on_file_dialog_response(GObject *source_object, GAsyncResult *res, g
         char *filename = g_file_get_path(file);
         g_print("Selected file: %s\n", filename);
         fpath = g_strdup(filename);  // Make a copy of the string for fpath
-        //gtk_label_set_text(label, filename);
+        GtkWindow *parent = GTK_WINDOW(user_data);
+        GtkWidget *label = g_object_get_data(G_OBJECT(parent), "filepath_label");
+        if (label != NULL){
+            gtk_label_set_text(GTK_LABEL(label), filename);
+        }
         // Free resources
         g_free(filename);
         g_object_unref(file);
@@ -101,8 +105,9 @@ static void activate(GtkApplication *app, gpointer user_data) {
     // Get the button object from the UI file
     GtkWidget *file_choose = GTK_WIDGET(gtk_builder_get_object(builder, "file_choose"));
 
-    //GtkWidget *execute = GTK_WIDGET(gtk_builder_get_object(builder, "execute"));
+    GtkLabel *filepath_label = GTK_LABEL(gtk_builder_get_object(builder, "filepath"));
 
+    g_object_set_data(G_OBJECT(window), "filepath_label", filepath_label);
 
     // Connect the signal for the button click
     g_signal_connect(file_choose, "clicked", G_CALLBACK(ShowDialog), window);
