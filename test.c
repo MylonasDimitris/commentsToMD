@@ -86,7 +86,7 @@ static void ShowDialog(GtkButton *file_choose, gpointer user_data) {
 
     // Show the file dialog asynchronously
     gtk_file_dialog_open(file_dialog, parent, NULL, 
-        (GAsyncReadyCallback)on_file_dialog_response, NULL);
+        (GAsyncReadyCallback)on_file_dialog_response, parent);
 }
 
 
