@@ -4,7 +4,7 @@
   <!-- interface-name commentstomd.ui -->
   <requires lib="gtk" version="4.12"/>
   <object class="GtkWindow" id="window">
-    <property name="maximized">True</property>
+    <property name="maximized">False</property>
     <child>
       <object class="GtkBox" id="box">
         <property name="halign">center</property>
