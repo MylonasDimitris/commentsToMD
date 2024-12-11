@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Created with Cambalache 0.94.0 -->
+<interface>
+  <!-- interface-name commentstomd.ui -->
+  <requires lib="gtk" version="4.12"/>
+  <object class="GtkWindow" id="window">
+    <property name="maximized">True</property>
+    <child>
+      <object class="GtkButton" id="file_choose">
+        <property name="label">Choose File</property>
+        <property name="margin-end">200</property>
+        <property name="margin-start">200</property>
+        <property name="valign">center</property>
+        <!-- Custom object fragments -->
+      </object>
+    </child>
+  </object>
+</interface>
