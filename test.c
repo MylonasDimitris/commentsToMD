@@ -59,12 +59,12 @@ void extract_comments(const char *input_file, const char *output_file) {
 // Callback to handle the file dialog response
 static void on_file_dialog_response(GObject *source_object, GAsyncResult *res, gpointer user_data) {
     GFile *file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(source_object), res, NULL);
-
     if (file != NULL) {
         // A file was selected
         char *filename = g_file_get_path(file);
         g_print("Selected file: %s\n", filename);
         fpath = g_strdup(filename);  // Make a copy of the string for fpath
+        //gtk_label_set_text(label, filename);
         // Free resources
         g_free(filename);
         g_object_unref(file);
@@ -75,8 +75,11 @@ static void on_file_dialog_response(GObject *source_object, GAsyncResult *res, g
 }
 
 
-static void ShowDialog(GtkButton *button, gpointer user_data) {
+static void ShowDialog(GtkButton *file_choose, gpointer user_data) {
     GtkWindow *parent = GTK_WINDOW(user_data); // Parent window
+
+
+    
 
     // Create a new GtkFileDialog
     GtkFileDialog *file_dialog = gtk_file_dialog_new();
@@ -96,10 +99,13 @@ static void activate(GtkApplication *app, gpointer user_data) {
     GtkWidget *window = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
 
     // Get the button object from the UI file
-    GtkWidget *button = GTK_WIDGET(gtk_builder_get_object(builder, "file_choose"));
+    GtkWidget *file_choose = GTK_WIDGET(gtk_builder_get_object(builder, "file_choose"));
+
+    //GtkWidget *execute = GTK_WIDGET(gtk_builder_get_object(builder, "execute"));
+
 
     // Connect the signal for the button click
-    g_signal_connect(button, "clicked", G_CALLBACK(ShowDialog), window);
+    g_signal_connect(file_choose, "clicked", G_CALLBACK(ShowDialog), window);
 
     // Set the window as the main window
     gtk_window_set_application(GTK_WINDOW(window), app);

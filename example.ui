@@ -6,12 +6,36 @@
   <object class="GtkWindow" id="window">
     <property name="maximized">True</property>
     <child>
-      <object class="GtkButton" id="file_choose">
-        <property name="label">Choose File</property>
-        <property name="margin-end">200</property>
-        <property name="margin-start">200</property>
+      <object class="GtkBox" id="box">
+        <property name="halign">center</property>
         <property name="valign">center</property>
-        <!-- Custom object fragments -->
+        <child>
+          <object class="GtkButton" id="file_choose">
+            <property name="halign">center</property>
+            <property name="label">Choose File</property>
+            <property name="margin-bottom">400</property>
+            <property name="margin-end">200</property>
+            <property name="margin-top">400</property>
+            <property name="valign">center</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkLabel" id="filepath">
+            <property name="label">No File Chosen</property>
+            <property name="margin-bottom">400</property>
+            <property name="valign">center</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton" id="execute">
+            <property name="halign">center</property>
+            <property name="label">Create .MD </property>
+            <property name="margin-bottom">400</property>
+            <property name="margin-start">200</property>
+            <property name="margin-top">400</property>
+            <property name="valign">center</property>
+          </object>
+        </child>
       </object>
     </child>
   </object>
