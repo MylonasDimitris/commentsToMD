@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char filepath[200];
+char *fpath;
 
 
 // Function to extract comments from a file
@@ -64,7 +64,7 @@ static void on_file_dialog_response(GObject *source_object, GAsyncResult *res, g
         // A file was selected
         char *filename = g_file_get_path(file);
         g_print("Selected file: %s\n", filename);
-
+        fpath = g_strdup(filename);  // Make a copy of the string for fpath
         // Free resources
         g_free(filename);
         g_object_unref(file);
