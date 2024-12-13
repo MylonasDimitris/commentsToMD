@@ -5,7 +5,6 @@
 
 char *fpath;
 
-
 // Function to extract comments from a file
 void extract_comments(GtkButton *execute, gpointer user_data) {
     char *input_file = g_strdup(fpath);
@@ -36,29 +35,63 @@ void extract_comments(GtkButton *execute, gpointer user_data) {
 
     char line[1024];
     int in_multiline_comment = 0;
+    int in_code_block = 0;
+    char *start_marker = "/*CODE*/";
+    char *end_marker = "/*/CODE*/";
 
     while (fgets(line, sizeof(line), input)) {
-        char *single_line_comment = strstr(line, "//");
-        char *multi_line_start = strstr(line, "/*");
-        char *multi_line_end = strstr(line, "*/");
+        // Check if we are entering a CODE block
+        if (!in_code_block && strstr(line, start_marker)) {
+            in_code_block = 1;
+            // Print the starting backticks before the code block
+            fprintf(output, "```\n");
+            // Skip everything before "CODE" starts, don't print start_marker
+            char *code_start = strstr(line, start_marker) + strlen(start_marker);
+            fprintf(output, "%s", code_start);  // Print everything after "CODE" start
+            continue;
+        }
 
-        if (in_multiline_comment) {
-            if (multi_line_end) {
-                *multi_line_end = '\0';
-                fprintf(output, "%s\n", line);
-                in_multiline_comment = 0;
+        // If we are inside a CODE block, check if we find the end marker
+        if (in_code_block) {
+            if (strstr(line, end_marker)) {
+                // Print everything before the end_marker and exit the block
+                char *code_end = strstr(line, end_marker);
+                *code_end = '\0'; // Terminate the line before the end_marker
+                fprintf(output, "%s\n", line);  // Print the code content
+                // Print the ending backticks after the code block
+                fprintf(output, "```\n");
+                in_code_block = 0;  // End the CODE block
             } else {
+                // Print the content of the CODE block as is
                 fprintf(output, "%s", line);
             }
-        } else if (single_line_comment && (!multi_line_start || single_line_comment < multi_line_start)) {
-            fprintf(output, "%s\n", single_line_comment + 2);
-        } else if (multi_line_start) {
-            if (multi_line_end && multi_line_end > multi_line_start) {
-                *multi_line_end = '\0';
-                fprintf(output, "%s\n", multi_line_start + 2);
-            } else {
-                in_multiline_comment = 1;
-                fprintf(output, "%s", multi_line_start + 2);
+        } else {
+            // Handle normal comments
+            char *single_line_comment = strstr(line, "//");
+            char *multi_line_start = strstr(line, "/*");
+            char *multi_line_end = strstr(line, "*/");
+
+            if (in_multiline_comment) {
+                // If inside a multi-line comment, look for the end
+                if (multi_line_end) {
+                    *multi_line_end = '\0'; // End the comment
+                    fprintf(output, "%s\n", line); // Output comment content
+                    in_multiline_comment = 0;
+                } else {
+                    fprintf(output, "%s", line); // Output content of the multi-line comment
+                }
+            } else if (single_line_comment && (!multi_line_start || single_line_comment < multi_line_start)) {
+                // Handle single-line comments
+                fprintf(output, "%s\n", single_line_comment + 2);  // Print after "//"
+            } else if (multi_line_start) {
+                // If we find the start of a multi-line comment
+                if (multi_line_end && multi_line_end > multi_line_start) {
+                    *multi_line_end = '\0'; // End the comment
+                    fprintf(output, "%s\n", multi_line_start + 2); // Print content between /* and */
+                } else {
+                    in_multiline_comment = 1;
+                    fprintf(output, "%s", multi_line_start + 2); // Start multi-line comment block
+                }
             }
         }
     }
@@ -67,10 +100,7 @@ void extract_comments(GtkButton *execute, gpointer user_data) {
     fclose(output);
     g_free(input_file);
     g_free(output_file);
-
-
 }
-
 
 // Callback to handle the file dialog response
 static void on_file_dialog_response(GObject *source_object, GAsyncResult *res, gpointer user_data) {
@@ -94,12 +124,8 @@ static void on_file_dialog_response(GObject *source_object, GAsyncResult *res, g
     }
 }
 
-
 static void ShowDialog(GtkButton *file_choose, gpointer user_data) {
     GtkWindow *parent = GTK_WINDOW(user_data); // Parent window
-
-
-    
 
     // Create a new GtkFileDialog
     GtkFileDialog *file_dialog = gtk_file_dialog_new();
@@ -108,8 +134,6 @@ static void ShowDialog(GtkButton *file_choose, gpointer user_data) {
     gtk_file_dialog_open(file_dialog, parent, NULL, 
         (GAsyncReadyCallback)on_file_dialog_response, parent);
 }
-
-
 
 static void activate(GtkApplication *app, gpointer user_data) {
     // Load the UI from the .ui file
@@ -141,6 +165,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     // Clean up
     g_object_unref(builder);  // Don't forget to free the builder
 }
+
 
 int main(int argc, char *argv[]) {
     // Create the GtkApplication
