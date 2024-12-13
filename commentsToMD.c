@@ -75,22 +75,47 @@ void extract_comments(GtkButton *execute, gpointer user_data) {
                 // If inside a multi-line comment, look for the end
                 if (multi_line_end) {
                     *multi_line_end = '\0'; // End the comment
-                    fprintf(output, "%s\n", line); // Output comment content
+                    // Skip leading space if the first character is a space
+                    if (line[0] == ' ') {
+                        fprintf(output, "%s\n", line + 1); // Skip the leading space
+                    } else {
+                        fprintf(output, "%s\n", line); // Output comment content
+                    }
                     in_multiline_comment = 0;
                 } else {
-                    fprintf(output, "%s", line); // Output content of the multi-line comment
+                    // Skip leading space if the first character is a space
+                    if (line[0] == ' ') {
+                        fprintf(output, "%s", line + 1); // Skip the leading space
+                    } else {
+                        fprintf(output, "%s", line); // Output content of the multi-line comment
+                    }
                 }
             } else if (single_line_comment && (!multi_line_start || single_line_comment < multi_line_start)) {
                 // Handle single-line comments
-                fprintf(output, "%s\n", single_line_comment + 2);  // Print after "//"
+                // Skip leading space if the first character is a space
+                if (single_line_comment[2] == ' ') {
+                    fprintf(output, "%s\n", single_line_comment + 3);  // Skip the space after "//"
+                } else {
+                    fprintf(output, "%s\n", single_line_comment + 2);  // Print after "//"
+                }
             } else if (multi_line_start) {
                 // If we find the start of a multi-line comment
                 if (multi_line_end && multi_line_end > multi_line_start) {
                     *multi_line_end = '\0'; // End the comment
-                    fprintf(output, "%s\n", multi_line_start + 2); // Print content between /* and */
+                    // Skip leading space if the first character is a space
+                    if (multi_line_start[2] == ' ') {
+                        fprintf(output, "%s\n", multi_line_start + 3); // Skip the space after "/*"
+                    } else {
+                        fprintf(output, "%s\n", multi_line_start + 2); // Print content between /* and */
+                    }
                 } else {
                     in_multiline_comment = 1;
-                    fprintf(output, "%s", multi_line_start + 2); // Start multi-line comment block
+                    // Skip leading space if the first character is a space
+                    if (multi_line_start[2] == ' ') {
+                        fprintf(output, "%s", multi_line_start + 3); // Skip the space after "/*"
+                    } else {
+                        fprintf(output, "%s", multi_line_start + 2); // Start multi-line comment block
+                    }
                 }
             }
         }
