@@ -4,6 +4,7 @@
 #include <string.h>
 
 char *fpath;
+bool multineCommentsOnly = FALSE;
 
 // Function to extract comments from a file
 void extract_comments(GtkButton *execute, gpointer user_data) {
@@ -90,7 +91,7 @@ void extract_comments(GtkButton *execute, gpointer user_data) {
                         fprintf(output, "%s", line); // Output content of the multi-line comment
                     }
                 }
-            } else if (single_line_comment && (!multi_line_start || single_line_comment < multi_line_start)) {
+            } else if (single_line_comment && (!multi_line_start || single_line_comment < multi_line_start) && !multineCommentsOnly) {
                 // Handle single-line comments
                 // Skip leading space if the first character is a space
                 if (single_line_comment[2] == ' ') {
@@ -160,6 +161,10 @@ static void ShowDialog(GtkButton *file_choose, gpointer user_data) {
         (GAsyncReadyCallback)on_file_dialog_response, parent);
 }
 
+static void multilineOnly(GObject *source_object, gpointer user_data){
+    multineCommentsOnly = TRUE;
+}
+
 static void activate(GtkApplication *app, gpointer user_data) {
     // Load the UI from the .ui file
     GtkBuilder *builder = gtk_builder_new_from_file("GTK4GUI.ui");
@@ -172,6 +177,10 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
     GtkWidget *execute = GTK_WIDGET(gtk_builder_get_object(builder, "execute"));
 
+    // Get the checkbox object from the UI File
+
+    GtkWidget *multilineCheck = GTK_WIDGET(gtk_builder_get_object(builder, "multilineCheck"));
+
     // Get the label object from the UI file
     GtkLabel *filepath_label = GTK_LABEL(gtk_builder_get_object(builder, "filepath"));
 
@@ -180,6 +189,9 @@ static void activate(GtkApplication *app, gpointer user_data) {
     // Connect the signal for the button click
     g_signal_connect(file_choose, "clicked", G_CALLBACK(ShowDialog), window);
     g_signal_connect(execute, "clicked", G_CALLBACK(extract_comments), NULL);
+
+    // Connect the signal for the Check Button
+    g_signal_connect(multilineCheck, "activated", G_CALLBACK(multilineOnly), NULL);
 
     // Set the window as the main window
     gtk_window_set_application(GTK_WINDOW(window), app);
