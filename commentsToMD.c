@@ -162,7 +162,7 @@ static void ShowDialog(GtkButton *file_choose, gpointer user_data) {
 }
 
 static void multilineOnly(GObject *source_object, gpointer user_data){
-    multineCommentsOnly = TRUE;
+    multineCommentsOnly = !multineCommentsOnly;
 }
 
 static void activate(GtkApplication *app, gpointer user_data) {
@@ -191,7 +191,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     g_signal_connect(execute, "clicked", G_CALLBACK(extract_comments), NULL);
 
     // Connect the signal for the Check Button
-    g_signal_connect(multilineCheck, "activated", G_CALLBACK(multilineOnly), NULL);
+    g_signal_connect(multilineCheck, "toggled", G_CALLBACK(multilineOnly), NULL);
 
     // Set the window as the main window
     gtk_window_set_application(GTK_WINDOW(window), app);
